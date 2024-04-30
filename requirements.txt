@@ -1,2 +1,5 @@
 scrapy
 scrapy-do
+line-bot-sdk
+Flask
+requests

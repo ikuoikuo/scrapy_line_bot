@@ -5,8 +5,11 @@ services:
     build: .
     ports:
       - '7654:7654'
+      - '9999:9999'
     volumes:
       - '.:/app'
     tty: true
     stdin_open: true
-    
+    environment:
+      - CHANNEL_ACCESS_TOKEN=${CHANNEL_ACCESS_TOKEN}
+      - CHANNEL_SECRET=${CHANNEL_SECRET}
