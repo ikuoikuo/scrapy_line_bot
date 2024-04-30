@@ -5,29 +5,37 @@
 
 
 # useful for handling different item types with a single interface
-import datetime
 import os
 import sqlite3
 import requests
 
 class AidbScrapyPipeline(object):
+    # _db = sqlite3.connect(os.path.join("/app/aidb_acrapy", 'aidb.db'))
     _db = None
 
     @classmethod
     def get_database(cls):
-        cls._db = sqlite3.connect(
-            os.path.join(os.getcwd(), 'aidb.db'))
-
-        cursor = cls._db.cursor()
-        cursor.execute(
-            'CREATE TABLE IF NOT EXISTS post(\
-                id INTEGER PRIMARY KEY AUTOINCREMENT, \
-                url TEXT UNIQUE NOT NULL, \
-                title TEXT NOT NULL, \
-                date DATE NOT NULL \
-            );')
+        if cls._db is None:  # データベース接続が未定義の場合にのみ接続
+            db_path = os.path.join(os.getcwd(), 'aidb.db')
+            print(os.getcwd())
+            cls._db = sqlite3.connect(db_path)
+            cls._initialize_db()
 
         return cls._db
+
+    @classmethod
+    def _initialize_db(cls):
+        """データベースの初期化とテーブルの作成を行う"""
+        cursor = cls._db.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS post(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                url TEXT UNIQUE NOT NULL,
+                title TEXT NOT NULL,
+                date TEXT NOT NULL
+            );
+        ''')
+        cls._db.commit()
 
     def process_item(self, item, spider):
         """
@@ -37,7 +45,7 @@ class AidbScrapyPipeline(object):
         self.save_post(item)
         return item
 
-    def call_send_message(message_text):
+    def call_send_message(self,message_text):
         """
         DBに追加する場合はLINEに内容を追加する。
         """
@@ -54,30 +62,36 @@ class AidbScrapyPipeline(object):
         """
         item を DB に保存する
         """
-        if self.find_post(item['url']):
+        if self.post_exists(item['url']):
             # 既に同じURLのデータが存在する場合はスキップ
+            self.call_send_message("すでにデータが存在するぜ！")
             return
-
         db = self.get_database()
         db.execute(
             'INSERT INTO post (title, url, date) VALUES (?, ?, ?)', (
                 item['title'],
                 item['url'],
-                datetime.datetime.strptime(item['date'], '%B %d, %Y')
+                item['date']
             )
         )
         db.commit()
-        message_text = f"""おはようございます。\n
-                            日付：{item['date']}\n
-                            {item['title']}\n
-                            {item['url']}"""
+        message_text = (
+            f"おはよう。筋トレ行く前にこれ読めって。\n"
+            f"理解できないと厳しいって。\n"
+            
+            "-------------------------------\n"
+            f"日付：{item['date']}\n"
+            f"タイトル：{item['title']}\n"
+            f"URL：{item['url']}\n"
+            "-------------------------------"
+        )
         self.call_send_message(message_text)
 
-    def find_post(self, url):
+    def post_exists(self, url):
         db = self.get_database()
         cursor = db.execute(
             'SELECT * FROM post WHERE url=?',
             (url,)
         )
-        return cursor.fetchone()
+        return cursor.fetchone() is not None
     
