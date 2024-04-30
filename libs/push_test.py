@@ -1,16 +1,18 @@
 import requests
 
-def call_send_message():
-    # Flask アプリケーションが実行されているアドレス
+def call_send_message(message_text):
+    """
+    DBに追加する場合はLINEに内容を追加する。
+    """
     url = 'http://localhost:9999/send_message'
+    params = {'message': message_text}
     try:
-        # GET リクエストを送信
-        response = requests.get(url)
+        response = requests.get(url, params=params)
         print(f'Status Code: {response.status_code}')
         print(f'Response Body: {response.text}')
     except requests.exceptions.RequestException as e:
         print(f'An error occurred: {e}')
 
 if __name__ == "__main__":
-    call_send_message()
+    call_send_message("こんにちは！")
     
