@@ -10,14 +10,15 @@ import sqlite3
 import requests
 
 class AidbScrapyPipeline(object):
-    # _db = sqlite3.connect(os.path.join("/app/aidb_acrapy", 'aidb.db'))
-    _db = None
+    try:
+        _db = sqlite3.connect(os.path.join('/app/aidb_scrapy', 'aidb.db'))
+    except:
+        _db = None
 
     @classmethod
     def get_database(cls):
         if cls._db is None:  # データベース接続が未定義の場合にのみ接続
-            db_path = os.path.join(os.getcwd(), 'aidb.db')
-            print(os.getcwd())
+            db_path = os.path.join('/app/aidb_scrapy', 'aidb.db')
             cls._db = sqlite3.connect(db_path)
             cls._initialize_db()
 
@@ -64,7 +65,6 @@ class AidbScrapyPipeline(object):
         """
         if self.post_exists(item['url']):
             # 既に同じURLのデータが存在する場合はスキップ
-            self.call_send_message("すでにデータが存在するぜ！")
             return
         db = self.get_database()
         db.execute(
@@ -81,7 +81,7 @@ class AidbScrapyPipeline(object):
             
             "-------------------------------\n"
             f"日付：{item['date']}\n"
-            f"タイトル：{item['title']}\n"
+            f"タイトル：\n{item['title']}\n"
             f"URL：{item['url']}\n"
             "-------------------------------"
         )
