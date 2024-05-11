@@ -74,7 +74,7 @@ class AidbScrapyPipeline(object):
                 # 既に同じURLのデータが存在する場合はスキップ(1日1回のみ以下を送信)
                 message_text = (
                 f"おはよう。今日の更新はないって。\n"
-                f"たっぷり筋トレしろって。\n"
+                f"たっぷり筋トレしろって。"
                 )
                 self.call_send_message(message_text)
                 self.send_message = True
@@ -99,6 +99,7 @@ class AidbScrapyPipeline(object):
             "-------------------------------"
         )
         self.call_send_message(message_text)
+        self.send_message = True
         return 
 
     def post_exists(self, url):
