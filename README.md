@@ -1,3 +1,6 @@
+<img width="453" alt="image" src="https://github.com/ikuoikuo/scrapy_line_bot/assets/92318768/a4bfcf46-e393-49f8-81df-6bcbec87b52b">
+
+
 ## Usage
 1. プロジェクトのダウンロード
 
